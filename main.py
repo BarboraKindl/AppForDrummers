@@ -8,12 +8,12 @@ from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, \
 from pydub import AudioSegment
 from pytube import YouTube
 
-# Nastavení logování
+# Logging settings
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-# Funkce pro stažení audia z YouTube
+# Function to download audio from YouTube
 def download_audio(url, output_path):
     try:
         logging.info(f"Starting download for URL: {url}")
@@ -35,7 +35,7 @@ def download_audio(url, output_path):
         return None
 
 
-# Funkce pro úpravu audia
+# Function to edit audio
 def edit_audio(file_path, start_time, end_time, output_file):
     try:
         audio = AudioSegment.from_file(file_path)
@@ -46,19 +46,19 @@ def edit_audio(file_path, start_time, end_time, output_file):
         print(f"Error editing audio: {e}")
 
 
-# Hlavní třída aplikace
+# Main application class
 class MyApp(QWidget):
     def __init__(self):
         super().__init__()
 
-        # Nastavení okna
+        # Window settings
         self.setWindowTitle('DrumApp')
         self.setGeometry(100, 100, 400, 300)
 
-        # Nastavení ikony aplikace
+        # Application icon settings
         self.setWindowIcon(QIcon("MyApp.iconset/icon_64x64.png"))
 
-        # Vytvoření GUI komponent
+        # Create GUI components
         self.url_input = QLineEdit(self)
         self.url_input.setPlaceholderText("Vložte YouTube URL")
 
@@ -67,7 +67,7 @@ class MyApp(QWidget):
 
         self.status_label = QLabel('', self)
 
-        # Nastavení layoutu
+        # Layout settings
         layout = QVBoxLayout()
         layout.addWidget(self.url_input)
         layout.addWidget(self.download_button)
@@ -91,8 +91,8 @@ class MyApp(QWidget):
 
                 downloaded_file = download_audio(url, download_path)
                 if downloaded_file:
-                    start_time = 10 * 1000  # 10 sekund
-                    end_time = 30 * 1000  # 30 sekund
+                    start_time = 10 * 1000  # 10 seconds
+                    end_time = 30 * 1000  # 30 seconds
                     edit_audio(downloaded_file, start_time, end_time,
                                save_path)
                     self.status_label.setText(
@@ -107,7 +107,7 @@ class MyApp(QWidget):
             self.status_label.setText("Prosím, vložte platné YouTube URL.")
 
 
-# Hlavní část programu
+# Main part of the program
 def main():
     app = QApplication(sys.argv)
     window = MyApp()
