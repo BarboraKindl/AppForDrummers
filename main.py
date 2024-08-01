@@ -54,7 +54,33 @@ class MyApp(QWidget):
         # Application icon settings
         self.setWindowIcon(QIcon("MyApp.iconset/icon_64x64.png"))
 
-        # Create GUI components
+        # Set stylesheet for the application
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #f0f0f0;
+                font-family: Arial, sans-serif;
+            }
+            QLineEdit {
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                margin-bottom: 10px;
+            }
+            QPushButton {
+                padding: 10px;
+                background-color: #007BFF;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                margin-bottom: 10px;
+            }
+            QPushButton:hover {
+                background-color: #0056b3;
+            }
+            QLabel {
+                margin-bottom: 10px;
+            }
+        """)
         self.url_input = QLineEdit(self)
         self.url_input.setPlaceholderText("Vložte YouTube URL")
 
@@ -65,6 +91,8 @@ class MyApp(QWidget):
 
         # Layout settings
         layout = QVBoxLayout()
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(10)
         layout.addWidget(self.url_input)
         layout.addWidget(self.download_button)
         layout.addWidget(self.status_label)
