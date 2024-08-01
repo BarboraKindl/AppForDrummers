@@ -37,7 +37,13 @@ def download_audio(url, output_path, progress_callback=None):
         logging.info(f"Downloaded and saved to: {new_file}")
         return new_file
     except Exception as e:
-        print(f"Error downloading audio: {e}")
+        logging.error(f"Error downloading audio: {e}")
+        if isinstance(e, HTTPError):
+            logging.error(f"HTTP Error: {e.code} - {e.reason}")
+        elif isinstance(e, URLError):
+            logging.error(f"URL Error: {e.reason}")
+        else:
+            logging.error(f"Unexpected error: {e}")
         return None
 
 
