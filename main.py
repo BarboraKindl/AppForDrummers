@@ -19,8 +19,10 @@ def download_audio(url, output_path, progress_callback=None):
     try:
         logging.info(f"Starting download for URL: {url}")
         yt = YouTube(url.strip())
+        logging.info(f"Requesting streams for URL: {url.strip()}")
         logging.info(f"Title: {yt.title}, Length: {yt.length} seconds")
         audio_stream = yt.streams.filter(only_audio=True).first()
+        logging.info(f"Available streams: {yt.streams}")
         total_size = audio_stream.filesize
         bytes_downloaded = 0
 
