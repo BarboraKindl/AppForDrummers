@@ -117,16 +117,9 @@ class MyApp(QWidget):
             self.status_label.setText("Prosím, vložte platné YouTube URL.")
             return
 
-        try:
-            if not ("youtube.com/watch?v=" in url or "youtu.be/" in url):
-                self.status_label.setText("Neplatné YouTube URL.")
-                logging.error(f"Invalid YouTube URL: {url}")
-                return
-
-            yt = YouTube(url)
-        except Exception as e:
+        if not ("youtube.com/watch?v=" in url or "youtu.be/" in url):
             self.status_label.setText("Neplatné YouTube URL.")
-            logging.error(f"Invalid YouTube URL: {e}")
+            logging.error(f"Invalid YouTube URL: {url}")
             return
 
         logging.info(f"Downloading and editing audio for URL: {url}")
