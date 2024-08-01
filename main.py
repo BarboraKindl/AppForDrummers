@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+from urllib.error import HTTPError, URLError
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, \
