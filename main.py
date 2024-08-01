@@ -26,9 +26,6 @@ def download_audio(url, output_path):
         os.rename(output_file, new_file)
         logging.info(f"Downloaded and saved to: {new_file}")
         return new_file
-        logging.info(f"Audio edited and saved to: {output_file}")
-    except Exception as e:
-        logging.error(f"Error editing audio: {e}")
         logging.error(f"Error downloading audio: {e}")
     except Exception as e:
         print(f"Error downloading audio: {e}")
