@@ -149,31 +149,25 @@ class MyApp(QWidget):
             return
 
         logging.info(f"Downloading and editing audio for URL: {url}")
-        save_path, _ = QFileDialog.getSaveFileName(self, "Uložit soubor", "", "MP3 Files (*.mp3)")
-        if save_path and not save_path.endswith(".mp3"):
-            save_path += ".mp3"
-        if save_path:
-            self.progress_bar.setVisible(True)
-            self.progress_bar.setValue(0)
-            download_path = os.path.dirname(save_path)
-            os.makedirs(download_path, exist_ok=True)
+        download_path = os.path.expanduser("~/Downloads")
+        os.makedirs(download_path, exist_ok=True)
 
-            downloaded_file = download_audio(url, download_path, self.progress_bar.setValue)
-            if downloaded_file:
-                start_time = 10 * 1000  # 10 seconds
-                end_time = 30 * 1000  # 30 seconds
-                edit_audio(downloaded_file, start_time, end_time,
-                           save_path)
-                self.status_label.setText(
-                    "Audio bylo úspěšně staženo a upraveno!")
-                logging.info("Audio successfully downloaded and edited.")
-                self.progress_bar.setVisible(False)
-            else:
-                self.progress_bar.setVisible(False)
-                logging.error("Download failed.")
-                self.status_label.setText("Stažení se nezdařilo.")
+        self.progress_bar.setVisible(True)
+        self.progress_bar.setValue(0)
+
+        downloaded_file = download_audio(url, download_path, self.progress_bar.setValue)
+        if downloaded_file:
+            start_time = 10 * 1000  # 10 seconds
+            end_time = 30 * 1000  # 30 seconds
+            save_path = os.path.join(download_path, "edited_audio.mp3")
+            edit_audio(downloaded_file, start_time, end_time, save_path)
+            self.status_label.setText("Audio bylo úspěšně staženo a upraveno!")
+            logging.info("Audio successfully downloaded and edited.")
+            self.progress_bar.setVisible(False)
         else:
-            self.status_label.setText("Uložení bylo zrušeno.")
+            self.progress_bar.setVisible(False)
+            logging.error("Download failed.")
+            self.status_label.setText("Stažení se nezdařilo.")
 
 
 # Main part of the program
