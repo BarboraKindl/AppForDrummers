@@ -16,50 +16,56 @@ logging.basicConfig(level=logging.INFO,
 
 # Function to download audio from YouTube
 def download_audio(url, output_path, progress_callback=None):
-    try:
-        logging.info(f"Starting download for URL: {url}")
-        def on_progress(stream, chunk, bytes_remaining):
-            nonlocal bytes_downloaded
-            bytes_downloaded += len(chunk)
-            if progress_callback:
-                progress_callback(int(bytes_downloaded / total_size * 100))
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            logging.info(f"Starting download for URL: {url}")
+            def on_progress(stream, chunk, bytes_remaining):
+                nonlocal bytes_downloaded
+                bytes_downloaded += len(chunk)
+                if progress_callback:
+                    progress_callback(int(bytes_downloaded / total_size * 100))
 
-        yt = YouTube(url.strip(), on_progress_callback=on_progress, use_oauth=True, allow_oauth_cache=True)
-        logging.info(f"Requesting streams for URL: {url.strip()} with video ID: {yt.video_id}")
-        logging.info(f"Title: {yt.title}, Length: {yt.length} seconds, Author: {yt.author}")
-        audio_stream = yt.streams.filter(only_audio=True).first()
-        if not audio_stream:
-            raise ValueError("No audio stream found.")
-        logging.info(f"Selected audio stream: {audio_stream}")
-        logging.info(f"Available streams: {yt.streams}")
-        total_size = audio_stream.filesize
-        bytes_downloaded = 0
+            yt = YouTube(url.strip(), on_progress_callback=on_progress, use_oauth=True, allow_oauth_cache=True)
+            logging.info(f"Requesting streams for URL: {url.strip()} with video ID: {yt.video_id}")
+            logging.info(f"Title: {yt.title}, Length: {yt.length} seconds, Author: {yt.author}")
+            audio_stream = yt.streams.filter(only_audio=True).first()
+            if not audio_stream:
+                raise ValueError("No audio stream found.")
+            logging.info(f"Selected audio stream: {audio_stream}")
+            logging.info(f"Available streams: {yt.streams}")
+            total_size = audio_stream.filesize
+            bytes_downloaded = 0
 
-        def on_progress(stream, chunk, bytes_remaining):
-            nonlocal bytes_downloaded
-            bytes_downloaded += len(chunk)
-            if progress_callback:
-                progress_callback(int(bytes_downloaded / total_size * 100))
+            def on_progress(stream, chunk, bytes_remaining):
+                nonlocal bytes_downloaded
+                bytes_downloaded += len(chunk)
+                if progress_callback:
+                    progress_callback(int(bytes_downloaded / total_size * 100))
 
-        yt.register_on_progress_callback(on_progress)
-        output_file = audio_stream.download(output_path)
-        base, ext = os.path.splitext(output_file)
-        new_file = base + '.mp3'
-        os.rename(output_file, new_file)
-        logging.info(f"Downloaded and saved to: {new_file}")
-        return new_file
-    except Exception as e:
-        logging.error(f"Error downloading audio: {e}", exc_info=True)
-        if "HTTP Error 400" in str(e):
-            logging.error("HTTP Error 400: Bad Request. This might be due to an invalid URL or a temporary issue with YouTube.")
-        logging.error(f"Request URL: {url.strip()}")
-        if isinstance(e, HTTPError):
-            logging.error(f"HTTP Error: {e.code} - {e.reason}", exc_info=True)
-        elif isinstance(e, URLError):
-            logging.error(f"URL Error: {e.reason}", exc_info=True)
-        else:
-            logging.error(f"Unexpected error: {e}", exc_info=True)
-        return None
+            yt.register_on_progress_callback(on_progress)
+            output_file = audio_stream.download(output_path)
+            base, ext = os.path.splitext(output_file)
+            new_file = base + '.mp3'
+            os.rename(output_file, new_file)
+            logging.info(f"Downloaded and saved to: {new_file}")
+            return new_file
+        except Exception as e:
+            logging.error(f"Error downloading audio: {e}", exc_info=True)
+            if "HTTP Error 400" in str(e):
+                logging.error("HTTP Error 400: Bad Request. This might be due to an invalid URL or a temporary issue with YouTube.")
+            logging.error(f"Request URL: {url.strip()}")
+            if isinstance(e, HTTPError):
+                logging.error(f"HTTP Error: {e.code} - {e.reason}", exc_info=True)
+            elif isinstance(e, URLError):
+                logging.error(f"URL Error: {e.reason}", exc_info=True)
+            else:
+                logging.error(f"Unexpected error: {e}", exc_info=True)
+            if attempt < max_retries - 1:
+                logging.info(f"Retrying... ({attempt + 1}/{max_retries})")
+            else:
+                logging.error("Max retries reached. Download failed.")
+                return None
 
 
 # Function to edit audio
