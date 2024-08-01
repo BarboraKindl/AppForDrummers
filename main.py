@@ -79,23 +79,27 @@ class MyApp(QWidget):
             self.status_label.setText("Prosím, vložte platné YouTube URL.")
             return
 
-        logging.info(f"Downloading and editing audio for URL: {url}")
-        download_path = "downloads"
-        edited_path = "edited"
-        os.makedirs(download_path, exist_ok=True)
-        os.makedirs(edited_path, exist_ok=True)
+        if url:
+            logging.info(f"Downloading and editing audio for URL: {url}")
+            save_path, _ = QFileDialog.getSaveFileName(self, "Uložit soubor", "", "MP3 Files (*.mp3)")
+            if save_path:
+                download_path = os.path.dirname(save_path)
+                os.makedirs(download_path, exist_ok=True)
 
-        downloaded_file = download_audio(url, download_path)
-        if downloaded_file:
-            start_time = 10 * 1000  # 10 sekund
-            end_time = 30 * 1000  # 30 sekund
-            output_file = os.path.join(edited_path, "edited_audio.mp3")
-            edit_audio(downloaded_file, start_time, end_time, output_file)
-            self.status_label.setText("Audio bylo úspěšně staženo a upraveno!")
-            logging.info("Audio successfully downloaded and edited.")
+                downloaded_file = download_audio(url, download_path)
+                if downloaded_file:
+                    start_time = 10 * 1000  # 10 sekund
+                    end_time = 30 * 1000  # 30 sekund
+                    edit_audio(downloaded_file, start_time, end_time, save_path)
+                    self.status_label.setText("Audio bylo úspěšně staženo a upraveno!")
+                    logging.info("Audio successfully downloaded and edited.")
+                else:
+                    logging.error("Download failed.")
+                    self.status_label.setText("Stažení se nezdařilo.")
+            else:
+                self.status_label.setText("Uložení bylo zrušeno.")
         else:
-            logging.error("Download failed.")
-            self.status_label.setText("Stažení se nezdařilo.")
+            self.status_label.setText("Prosím, vložte platné YouTube URL.")
 
 
 # Hlavní část programu
