@@ -144,8 +144,9 @@ class MyApp(QWidget):
             return
 
         logging.info(f"Downloading and editing audio for URL: {url}")
-        save_path, _ = QFileDialog.getSaveFileName(self, "Uložit soubor",
-                                                   "", "MP3 Files (*.mp3)")
+        save_path, _ = QFileDialog.getSaveFileName(self, "Uložit soubor", "", "MP3 Files (*.mp3)")
+        if save_path and not save_path.endswith(".mp3"):
+            save_path += ".mp3"
         if save_path:
             self.progress_bar.setVisible(True)
             self.progress_bar.setValue(0)
