@@ -8,6 +8,10 @@ This project includes a main script `main.py` which serves as the entry point fo
 
 `main.py` is the primary script of the project. It contains the main logic and functions that drive the application. The script is responsible for initializing the application, handling user inputs, and executing the core functionalities.
 
+## png_marker.py
+
+`png_marker.py` is a utility script designed to handle PNG image processing tasks. It includes functions for reading, modifying, and saving PNG images. The script is useful for applications that require image manipulation, such as adding markers or annotations to images.
+
 ## Usage
 
 To run the application, execute the following command in your terminal:
