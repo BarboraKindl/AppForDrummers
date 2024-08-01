@@ -18,7 +18,7 @@ logging.basicConfig(level=logging.INFO,
 def download_audio(url, output_path, progress_callback=None):
     try:
         logging.info(f"Starting download for URL: {url}")
-        yt = YouTube(url)
+        yt = YouTube(url.strip())
         logging.info(f"Title: {yt.title}, Length: {yt.length} seconds")
         audio_stream = yt.streams.filter(only_audio=True).first()
         total_size = audio_stream.filesize
@@ -38,13 +38,13 @@ def download_audio(url, output_path, progress_callback=None):
         logging.info(f"Downloaded and saved to: {new_file}")
         return new_file
     except Exception as e:
-        logging.error(f"Error downloading audio: {e}")
+        logging.error(f"Error downloading audio: {e}", exc_info=True)
         if isinstance(e, HTTPError):
-            logging.error(f"HTTP Error: {e.code} - {e.reason}")
+            logging.error(f"HTTP Error: {e.code} - {e.reason}", exc_info=True)
         elif isinstance(e, URLError):
-            logging.error(f"URL Error: {e.reason}")
+            logging.error(f"URL Error: {e.reason}", exc_info=True)
         else:
-            logging.error(f"Unexpected error: {e}")
+            logging.error(f"Unexpected error: {e}", exc_info=True)
         return None
 
 
