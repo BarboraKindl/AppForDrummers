@@ -21,7 +21,10 @@ def download_audio(url, output_path, progress_callback=None):
         yt = YouTube(url.strip())
         logging.info(f"Requesting streams for URL: {url.strip()}")
         logging.info(f"Title: {yt.title}, Length: {yt.length} seconds")
+        logging.info(f"Requesting streams for URL: {url.strip()}")
+        logging.info(f"Title: {yt.title}, Length: {yt.length} seconds")
         audio_stream = yt.streams.filter(only_audio=True).first()
+        logging.info(f"Available streams: {yt.streams}")
         logging.info(f"Available streams: {yt.streams}")
         total_size = audio_stream.filesize
         bytes_downloaded = 0
@@ -129,6 +132,11 @@ class MyApp(QWidget):
             return
 
         try:
+            if not url.startswith("https://www.youtube.com/watch?v="):
+                self.status_label.setText("Neplatné YouTube URL.")
+                logging.error(f"Invalid YouTube URL: {url}")
+                return
+
             yt = YouTube(url)
         except Exception as e:
             self.status_label.setText("Neplatné YouTube URL.")
