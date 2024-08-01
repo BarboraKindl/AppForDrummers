@@ -29,6 +29,14 @@ Make sure you have all the necessary dependencies installed before running the s
 
 ## Installation
 
+### Installing youtube_dl
+
+To install `youtube_dl`, you can use pip:
+
+```bash
+pip install youtube_dl
+```
+
 1. Clone the repository:
    ```bash
    git clone <repository_url>
