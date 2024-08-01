@@ -42,6 +42,19 @@ Make sure you have all the necessary dependencies installed before running the s
    pip install -r requirements.txt
    ```
 
+## macOS
+
+Na macOS se ikona nastavuje přímo na aplikaci.
+
+Otevřete Finder:
+Najděte složku, kde je váš spustitelný soubor (.app).
+Změňte ikonu:
+Klikněte na aplikaci pravým tlačítkem a zvolte Zobrazit obsah balíčku.
+Přejděte do složky Contents/Resources.
+Nahraďte výchozí ikonu souborem .icns.
+Vytvořte zástupce na ploše:
+Přetáhněte aplikaci na plochu pro vytvoření zástupce.
+
 ## Contributing
 
 If you would like to contribute to this project, please fork the repository and submit a pull request. We welcome all contributions!
