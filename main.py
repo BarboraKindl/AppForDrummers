@@ -1,15 +1,17 @@
-import sys
-import os
 import logging
+import os
+import sys
+
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, \
     QLineEdit, QLabel, QFileDialog
-from PyQt5.QtGui import QIcon
-from pytube import YouTube
 from pydub import AudioSegment
-
+from pytube import YouTube
 
 # Nastavení logování
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 # Funkce pro stažení audia z YouTube
 def download_audio(url, output_path):
@@ -81,7 +83,8 @@ class MyApp(QWidget):
 
         if url:
             logging.info(f"Downloading and editing audio for URL: {url}")
-            save_path, _ = QFileDialog.getSaveFileName(self, "Uložit soubor", "", "MP3 Files (*.mp3)")
+            save_path, _ = QFileDialog.getSaveFileName(self, "Uložit soubor",
+                                                       "", "MP3 Files (*.mp3)")
             if save_path:
                 download_path = os.path.dirname(save_path)
                 os.makedirs(download_path, exist_ok=True)
@@ -90,8 +93,10 @@ class MyApp(QWidget):
                 if downloaded_file:
                     start_time = 10 * 1000  # 10 sekund
                     end_time = 30 * 1000  # 30 sekund
-                    edit_audio(downloaded_file, start_time, end_time, save_path)
-                    self.status_label.setText("Audio bylo úspěšně staženo a upraveno!")
+                    edit_audio(downloaded_file, start_time, end_time,
+                               save_path)
+                    self.status_label.setText(
+                        "Audio bylo úspěšně staženo a upraveno!")
                     logging.info("Audio successfully downloaded and edited.")
                 else:
                     logging.error("Download failed.")
