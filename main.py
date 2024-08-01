@@ -105,8 +105,6 @@ class MyApp(QWidget):
                 self.status_label.setText("Stažení se nezdařilo.")
         else:
             self.status_label.setText("Uložení bylo zrušeno.")
-        else:
-            self.status_label.setText("Prosím, vložte platné YouTube URL.")
 
 
 # Main part of the program
