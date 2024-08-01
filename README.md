@@ -44,16 +44,16 @@ Make sure you have all the necessary dependencies installed before running the s
 
 ## macOS
 
-Na macOS se ikona nastavuje přímo na aplikaci.
+On macOS, the icon is set directly on the application.
 
-Otevřete Finder:
-Najděte složku, kde je váš spustitelný soubor (.app).
-Změňte ikonu:
-Klikněte na aplikaci pravým tlačítkem a zvolte Zobrazit obsah balíčku.
-Přejděte do složky Contents/Resources.
-Nahraďte výchozí ikonu souborem .icns.
-Vytvořte zástupce na ploše:
-Přetáhněte aplikaci na plochu pro vytvoření zástupce.
+Open Finder:
+Find the folder where your executable file (.app) is located.
+Change the icon:
+Right-click on the application and select Show Package Contents.
+Navigate to the Contents/Resources folder.
+Replace the default icon with a .icns file.
+Create a desktop shortcut:
+Drag the application to the desktop to create a shortcut.
 
 ## Contributing
 
