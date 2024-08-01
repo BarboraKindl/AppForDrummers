@@ -137,7 +137,7 @@ class MyApp(QWidget):
             return
 
         try:
-            if not url.startswith("https://www.youtube.com/watch?v="):
+            if not ("youtube.com/watch?v=" in url or "youtu.be/" in url):
                 self.status_label.setText("Neplatné YouTube URL.")
                 logging.error(f"Invalid YouTube URL: {url}")
                 return
