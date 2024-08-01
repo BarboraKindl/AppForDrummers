@@ -4,7 +4,7 @@ import sys
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, \
-    QLineEdit, QLabel, QFileDialog
+    QLineEdit, QLabel, QFileDialog, QProgressBar
 from pydub import AudioSegment
 from pytube import YouTube
 
@@ -14,12 +14,22 @@ logging.basicConfig(level=logging.INFO,
 
 
 # Function to download audio from YouTube
-def download_audio(url, output_path):
+def download_audio(url, output_path, progress_callback=None):
     try:
         logging.info(f"Starting download for URL: {url}")
         yt = YouTube(url)
         logging.info(f"Title: {yt.title}, Length: {yt.length} seconds")
         audio_stream = yt.streams.filter(only_audio=True).first()
+        total_size = audio_stream.filesize
+        bytes_downloaded = 0
+
+        def on_progress(stream, chunk, bytes_remaining):
+            nonlocal bytes_downloaded
+            bytes_downloaded += len(chunk)
+            if progress_callback:
+                progress_callback(int(bytes_downloaded / total_size * 100))
+
+        yt.register_on_progress_callback(on_progress)
         output_file = audio_stream.download(output_path)
         base, ext = os.path.splitext(output_file)
         new_file = base + '.mp3'
@@ -88,6 +98,9 @@ class MyApp(QWidget):
         self.download_button.clicked.connect(self.download_and_edit)
 
         self.status_label = QLabel('', self)
+        self.progress_bar = QProgressBar(self)
+        self.progress_bar.setValue(0)
+        self.progress_bar.setVisible(False)
 
         # Layout settings
         layout = QVBoxLayout()
@@ -96,6 +109,7 @@ class MyApp(QWidget):
         layout.addWidget(self.url_input)
         layout.addWidget(self.download_button)
         layout.addWidget(self.status_label)
+        layout.addWidget(self.progress_bar)
 
         self.setLayout(layout)
 
@@ -116,10 +130,12 @@ class MyApp(QWidget):
         save_path, _ = QFileDialog.getSaveFileName(self, "Uložit soubor",
                                                    "", "MP3 Files (*.mp3)")
         if save_path:
+            self.progress_bar.setVisible(True)
+            self.progress_bar.setValue(0)
             download_path = os.path.dirname(save_path)
             os.makedirs(download_path, exist_ok=True)
 
-            downloaded_file = download_audio(url, download_path)
+            downloaded_file = download_audio(url, download_path, self.progress_bar.setValue)
             if downloaded_file:
                 start_time = 10 * 1000  # 10 seconds
                 end_time = 30 * 1000  # 30 seconds
@@ -128,7 +144,9 @@ class MyApp(QWidget):
                 self.status_label.setText(
                     "Audio bylo úspěšně staženo a upraveno!")
                 logging.info("Audio successfully downloaded and edited.")
+                self.progress_bar.setVisible(False)
             else:
+                self.progress_bar.setVisible(False)
                 logging.error("Download failed.")
                 self.status_label.setText("Stažení se nezdařilo.")
         else:
