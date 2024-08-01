@@ -46,14 +46,14 @@ Make sure you have all the necessary dependencies installed before running the s
 
 On macOS, the icon is set directly on the application.
 
-Open Finder:
-Find the folder where your executable file (.app) is located.
-Change the icon:
-Right-click on the application and select Show Package Contents.
-Navigate to the Contents/Resources folder.
-Replace the default icon with a .icns file.
-Create a desktop shortcut:
-Drag the application to the desktop to create a shortcut.
+1. Open Finder:
+- Find the folder where your executable file (.app) is located.
+2. Change the icon:
+- Right-click on the application and select Show Package Contents.
+- Navigate to the Contents/Resources folder.
+- Replace the default icon with a .icns file.
+3. Create a desktop shortcut:
+- Drag the application to the desktop to create a shortcut.
 
 ## Contributing
 
