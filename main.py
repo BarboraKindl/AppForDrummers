@@ -1,5 +1,6 @@
 import sys
 import os
+import logging
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, \
     QLineEdit, QLabel, QFileDialog
 from PyQt5.QtGui import QIcon
@@ -7,16 +8,26 @@ from pytube import YouTube
 from pydub import AudioSegment
 
 
+# Nastavení logování
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 # Funkce pro stažení audia z YouTube
 def download_audio(url, output_path):
     try:
+        logging.info(f"Starting download for URL: {url}")
         yt = YouTube(url)
+        logging.info(f"Title: {yt.title}, Length: {yt.length} seconds")
         audio_stream = yt.streams.filter(only_audio=True).first()
         output_file = audio_stream.download(output_path)
         base, ext = os.path.splitext(output_file)
         new_file = base + '.mp3'
         os.rename(output_file, new_file)
+        logging.info(f"Downloaded and saved to: {new_file}")
         return new_file
+        logging.info(f"Audio edited and saved to: {output_file}")
+    except Exception as e:
+        logging.error(f"Error editing audio: {e}")
+        logging.error(f"Error downloading audio: {e}")
     except Exception as e:
         print(f"Error downloading audio: {e}")
         return None
@@ -68,7 +79,7 @@ class MyApp(QWidget):
             self.status_label.setText("Prosím, vložte platné YouTube URL.")
             return
 
-        # Stažení audia
+        logging.info(f"Downloading and editing audio for URL: {url}")
         download_path = "downloads"
         edited_path = "edited"
         os.makedirs(download_path, exist_ok=True)
@@ -81,7 +92,9 @@ class MyApp(QWidget):
             output_file = os.path.join(edited_path, "edited_audio.mp3")
             edit_audio(downloaded_file, start_time, end_time, output_file)
             self.status_label.setText("Audio bylo úspěšně staženo a upraveno!")
+            logging.info("Audio successfully downloaded and edited.")
         else:
+            logging.error("Download failed.")
             self.status_label.setText("Stažení se nezdařilo.")
 
 
