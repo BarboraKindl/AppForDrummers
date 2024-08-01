@@ -18,10 +18,15 @@ logging.basicConfig(level=logging.INFO,
 def download_audio(url, output_path, progress_callback=None):
     try:
         logging.info(f"Starting download for URL: {url}")
+        def on_progress(stream, chunk, bytes_remaining):
+            nonlocal bytes_downloaded
+            bytes_downloaded += len(chunk)
+            if progress_callback:
+                progress_callback(int(bytes_downloaded / total_size * 100))
+
         yt = YouTube(url.strip(), on_progress_callback=on_progress)
         logging.info(f"Requesting streams for URL: {url.strip()} with video ID: {yt.video_id}")
         logging.info(f"Title: {yt.title}, Length: {yt.length} seconds, Author: {yt.author}")
-        logging.info(f"Selected audio stream: {audio_stream}")
         audio_stream = yt.streams.filter(only_audio=True).first()
         logging.info(f"Selected audio stream: {audio_stream}")
         logging.info(f"Available streams: {yt.streams}")
