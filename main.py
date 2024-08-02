@@ -145,13 +145,7 @@ class MyApp(QWidget):
 
         downloaded_file = download_audio(url, download_path, self.progress_bar.setValue)
         if downloaded_file:
-            start_time = 10 * 1000  # 10 seconds
-            end_time = 30 * 1000  # 30 seconds
-            save_path = os.path.join(download_path, "edited_audio.mp3")
-            edit_audio(downloaded_file, start_time, end_time, save_path)
-            self.status_label.setText("Audio bylo úspěšně staženo a upraveno!")
-            logging.info("Audio successfully downloaded and edited.")
-            self.progress_bar.setVisible(False)
+            remove_drums(downloaded_file, save_path)
         else:
             self.progress_bar.setVisible(False)
             logging.error("Download failed.")
