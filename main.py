@@ -7,7 +7,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, \
     QLineEdit, QLabel, QFileDialog, QProgressBar
 from pydub import AudioSegment
-import youtube_dl
+import yt_dlp as youtube_dl
 
 # Logging settings
 logging.basicConfig(level=logging.INFO,
@@ -27,16 +27,16 @@ def download_audio(url, output_path, progress_callback=None):
         'progress_hooks': [lambda d: progress_callback(int(d['downloaded_bytes'] / d['total_bytes'] * 100)) if progress_callback and d['status'] == 'downloading' else None],
     }
 
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        try:
+    try:
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
             info_dict = ydl.extract_info(url, download=False)
             file_name = ydl.prepare_filename(info_dict).replace('.webm', '.mp3').replace('.m4a', '.mp3')
             logging.info(f"Downloaded and saved to: {file_name}")
             return file_name
-        except Exception as e:
-            logging.error(f"Error downloading audio: {e}", exc_info=True)
-            return None
+    except Exception as e:
+        logging.error(f"Error downloading audio: {e}", exc_info=True)
+        return None
 
 
 # Function to edit audio
