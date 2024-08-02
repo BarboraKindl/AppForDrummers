@@ -1,13 +1,12 @@
 import logging
 import os
 import sys
-from urllib.error import HTTPError, URLError
 
+import yt_dlp as youtube_dl
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, \
     QLineEdit, QLabel, QFileDialog, QProgressBar
 from pydub import AudioSegment
-import yt_dlp as youtube_dl
 
 # Logging settings
 logging.basicConfig(level=logging.INFO,
@@ -24,14 +23,19 @@ def download_audio(url, output_path, progress_callback=None):
             'preferredcodec': 'mp3',
             'preferredquality': '192',
         }],
-        'progress_hooks': [lambda d: progress_callback(int(d['downloaded_bytes'] / d['total_bytes'] * 100)) if progress_callback and d['status'] == 'downloading' else None],
+        'progress_hooks': [lambda d: progress_callback(int(
+            d['downloaded_bytes'] / d[
+                'total_bytes'] * 100)) if progress_callback and d[
+            'status'] == 'downloading' else None],
     }
 
     try:
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
             info_dict = ydl.extract_info(url, download=False)
-            file_name = ydl.prepare_filename(info_dict).replace('.webm', '.mp3').replace('.m4a', '.mp3')
+            file_name = ydl.prepare_filename(info_dict).replace('.webm',
+                                                                '.mp3').replace(
+                '.m4a', '.mp3')
             logging.info(f"Downloaded and saved to: {file_name}")
             return file_name
     except Exception as e:
@@ -53,17 +57,22 @@ def edit_audio(file_path, start_time, end_time, output_file):
 class MyApp(QWidget):
     def select_and_edit_file(self):
         options = QFileDialog.Options()
-        file_path, _ = QFileDialog.getOpenFileName(self, "Vyberte MP3 soubor", "", "MP3 Files (*.mp3);;All Files (*)", options=options)
+        file_path, _ = QFileDialog.getOpenFileName(self, "Vyberte MP3 soubor",
+                                                   "",
+                                                   "MP3 Files (*.mp3);;All Files (*)",
+                                                   options=options)
         if file_path:
             logging.info(f"Selected file: {file_path}")
             base_name = os.path.basename(file_path)
             name, ext = os.path.splitext(base_name)
-            save_path = os.path.join(os.path.dirname(file_path), f"{name}_drumless{ext}")
+            save_path = os.path.join(os.path.dirname(file_path),
+                                     f"{name}_drumless{ext}")
             remove_drums(file_path, save_path)
             self.status_label.setText("Bicí byly úspěšně odstraněny!")
         else:
             self.status_label.setText("Výběr souboru byl zrušen.")
             logging.info("File selection was canceled.")
+
     def __init__(self):
         super().__init__()
 
@@ -143,7 +152,8 @@ class MyApp(QWidget):
         self.progress_bar.setVisible(True)
         self.progress_bar.setValue(0)
 
-        downloaded_file = download_audio(url, download_path, self.progress_bar.setValue)
+        downloaded_file = download_audio(url, download_path,
+                                         self.progress_bar.setValue)
         if downloaded_file:
             save_path = get_save_path(downloaded_file)
             remove_drums(downloaded_file, save_path)
@@ -163,21 +173,13 @@ def remove_drums(file_path, output_file):
     except Exception as e:
         logging.error(f"Error removing drums: {e}", exc_info=True)
 
+
 def validate_youtube_url(url):
     if "youtube.com/watch?v=" in url or "youtu.be/" in url:
         return True
     logging.error(f"Invalid YouTube URL: {url}")
     return False
 
-def main():
-    app = QApplication(sys.argv)
-    window = MyApp()
-    window.show()
-    sys.exit(app.exec_())
-    if "youtube.com/watch?v=" in url or "youtu.be/" in url:
-        return True
-    logging.error(f"Invalid YouTube URL: {url}")
-    return False
 
 def get_save_path(file_path=None):
     download_path = os.path.expanduser("~/Downloads")
@@ -191,6 +193,17 @@ def get_save_path(file_path=None):
     window = MyApp()
     window.show()
     sys.exit(app.exec_())
+
+
+def main():
+    app = QApplication(sys.argv)
+    window = MyApp()
+    window.show()
+    sys.exit(app.exec_())
+    if "youtube.com/watch?v=" in url or "youtu.be/" in url:
+        return True
+    logging.error(f"Invalid YouTube URL: {url}")
+    return False
 
 
 if __name__ == "__main__":
