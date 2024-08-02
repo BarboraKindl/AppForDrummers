@@ -96,28 +96,41 @@ class MyApp(QWidget):
         # Set stylesheet for the application
         self.setStyleSheet("""
             QWidget {
-                background-color: #f0f0f0;
-                font-family: Arial, sans-serif;
+                background-color: #2c3e50;
+                font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                color: #ecf0f1;
             }
             QLineEdit {
                 padding: 10px;
-                border: 1px solid #ccc;
+                border: 1px solid #34495e;
                 border-radius: 5px;
                 margin-bottom: 10px;
+                background-color: #34495e;
+                color: #ecf0f1;
             }
             QPushButton {
                 padding: 10px;
-                background-color: #007BFF;
+                background-color: #e74c3c;
                 color: white;
                 border: none;
                 border-radius: 5px;
                 margin-bottom: 10px;
             }
             QPushButton:hover {
-                background-color: #0056b3;
+                background-color: #c0392b;
             }
             QLabel {
                 margin-bottom: 10px;
+            }
+            QProgressBar {
+                background-color: #34495e;
+                border: 1px solid #34495e;
+                border-radius: 5px;
+                text-align: center;
+                color: #ecf0f1;
+            }
+            QProgressBar::chunk {
+                background-color: #e74c3c;
             }
         """)
         self.url_input = QLineEdit(self)
@@ -136,8 +149,8 @@ class MyApp(QWidget):
 
         # Layout settings
         layout = QVBoxLayout()
-        layout.setContentsMargins(20, 20, 20, 20)
-        layout.setSpacing(10)
+        layout.setContentsMargins(30, 30, 30, 30)
+        layout.setSpacing(15)
         layout.addWidget(self.url_input)
         layout.addWidget(self.download_button)
         layout.addWidget(self.select_file_button)
