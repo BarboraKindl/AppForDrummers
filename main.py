@@ -139,6 +139,9 @@ class MyApp(QWidget):
         self.download_button = QPushButton('Stáhnout mp3', self)
         self.download_button.clicked.connect(self.download_mp3)
 
+        self.download_mp4_button = QPushButton('Stáhnout mp4', self)
+        self.download_mp4_button.clicked.connect(self.download_mp4)
+
         self.select_file_button = QPushButton('Vybrat soubor', self)
         self.select_file_button.clicked.connect(self.select_and_edit_file)
 
@@ -153,6 +156,7 @@ class MyApp(QWidget):
         layout.setSpacing(15)
         layout.addWidget(self.url_input)
         layout.addWidget(self.download_button)
+        layout.addWidget(self.download_mp4_button)
         layout.addWidget(self.select_file_button)
         layout.addWidget(self.status_label)
         layout.addWidget(self.progress_bar)
@@ -160,6 +164,34 @@ class MyApp(QWidget):
         self.setLayout(layout)
 
     def download_mp3(self):
+        url = self.url_input.text()
+        if not url:
+            self.status_label.setText("Prosím, vložte platné YouTube URL.")
+            return
+
+        if not ("youtube.com/watch?v=" in url or "youtu.be/" in url):
+            self.status_label.setText("Neplatné YouTube URL.")
+            logging.error(f"Invalid YouTube URL: {url}")
+            return
+
+        logging.info(f"Downloading video for URL: {url}")
+        download_path = get_save_path()
+
+        self.progress_bar.setVisible(True)
+        self.progress_bar.setValue(0)
+
+        downloaded_file = download_video(url, download_path,
+                                         self.progress_bar.setValue)
+        if downloaded_file:
+            save_path = get_save_path(downloaded_file)
+            remove_drums(downloaded_file, save_path)
+        self.progress_bar.setVisible(False)
+        if downloaded_file:
+            self.status_label.setText("Video bylo úspěšně staženo!")
+        else:
+            self.status_label.setText("Stažení se nezdařilo.")
+
+    def download_mp4(self):
         url = self.url_input.text()
         if not url:
             self.status_label.setText("Prosím, vložte platné YouTube URL.")
@@ -186,7 +218,27 @@ class MyApp(QWidget):
             self.status_label.setText("Stažení se nezdařilo.")
 
 
-# Function to remove drums from an audio file
+# Function to download video from YouTube
+def download_video(url, output_path, progress_callback=None):
+    ydl_opts = {
+        'format': 'bestvideo+bestaudio/best',
+        'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
+        'progress_hooks': [lambda d: progress_callback(int(
+            d['downloaded_bytes'] / d[
+                'total_bytes'] * 100)) if progress_callback and d[
+            'status'] == 'downloading' else None],
+    }
+
+    try:
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+            info_dict = ydl.extract_info(url, download=False)
+            file_name = ydl.prepare_filename(info_dict)
+            logging.info(f"Downloaded and saved to: {file_name}")
+            return file_name
+    except Exception as e:
+        logging.error(f"Error downloading video: {e}", exc_info=True)
+        return None
 def remove_drums(file_path, output_file):
     try:
         audio = AudioSegment.from_file(file_path)
