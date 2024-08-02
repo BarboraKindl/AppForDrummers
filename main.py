@@ -145,10 +145,12 @@ class MyApp(QWidget):
         self.progress_bar.setVisible(True)
         self.progress_bar.setValue(0)
 
-        base_name = os.path.basename(downloaded_file)
-        name, ext = os.path.splitext(base_name)
-        save_path = os.path.join(download_path, f"{name}_drumless{ext}")
         downloaded_file = download_audio(url, download_path, self.progress_bar.setValue)
+        if downloaded_file:
+            base_name = os.path.basename(downloaded_file)
+            name, ext = os.path.splitext(base_name)
+            save_path = os.path.join(download_path, f"{name}_drumless{ext}")
+            remove_drums(downloaded_file, save_path)
         if downloaded_file:
             remove_drums(downloaded_file, save_path)
         else:
