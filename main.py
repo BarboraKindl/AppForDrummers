@@ -13,6 +13,16 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 
+def get_save_path(file_path=None):
+    download_path = os.path.expanduser("~/Downloads")
+    os.makedirs(download_path, exist_ok=True)
+    if file_path:
+        base_name = os.path.basename(file_path)
+        name, ext = os.path.splitext(base_name)
+        return os.path.join(download_path, f"{name}_drumless{ext}")
+    return download_path
+
+
 # Function to download audio from YouTube
 def download_audio(url, output_path, progress_callback=None):
     ydl_opts = {
@@ -142,8 +152,9 @@ class MyApp(QWidget):
             self.status_label.setText("Prosím, vložte platné YouTube URL.")
             return
 
-        if not validate_youtube_url(url):
+        if not ("youtube.com/watch?v=" in url or "youtu.be/" in url):
             self.status_label.setText("Neplatné YouTube URL.")
+            logging.error(f"Invalid YouTube URL: {url}")
             return
 
         logging.info(f"Downloading and editing audio for URL: {url}")
@@ -174,37 +185,8 @@ def remove_drums(file_path, output_file):
         logging.error(f"Error removing drums: {e}", exc_info=True)
 
 
-def validate_youtube_url(url):
-    if "youtube.com/watch?v=" in url or "youtu.be/" in url:
-        return True
-    logging.error(f"Invalid YouTube URL: {url}")
-    return False
-
-
-def get_save_path(file_path=None):
-    download_path = os.path.expanduser("~/Downloads")
-    os.makedirs(download_path, exist_ok=True)
-    if file_path:
-        base_name = os.path.basename(file_path)
-        name, ext = os.path.splitext(base_name)
-        return os.path.join(download_path, f"{name}_drumless{ext}")
-    return download_path
-    app = QApplication(sys.argv)
-    window = MyApp()
-    window.show()
-    sys.exit(app.exec_())
-
-
-def main():
-    app = QApplication(sys.argv)
-    window = MyApp()
-    window.show()
-    sys.exit(app.exec_())
-    if "youtube.com/watch?v=" in url or "youtu.be/" in url:
-        return True
-    logging.error(f"Invalid YouTube URL: {url}")
-    return False
-
-
 if __name__ == "__main__":
-    main()
+    app = QApplication(sys.argv)
+    window = MyApp()
+    window.show()
+    sys.exit(app.exec_())
