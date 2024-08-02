@@ -140,7 +140,6 @@ class MyApp(QWidget):
         self.download_button.clicked.connect(self.download_and_edit)
 
         self.select_file_button = QPushButton('Vybrat soubor', self)
-        self.new_button = QPushButton('Nové tlačítko', self)
         self.select_file_button.clicked.connect(self.select_and_edit_file)
 
         self.status_label = QLabel('', self)
