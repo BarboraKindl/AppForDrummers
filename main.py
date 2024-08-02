@@ -178,15 +178,12 @@ class MyApp(QWidget):
         self.progress_bar.setVisible(True)
         self.progress_bar.setValue(0)
 
-        downloaded_file = download_video(url, download_path,
-                                         self.progress_bar.setValue)
-        if downloaded_file:
-            self.status_label.setText("Audio bylo úspěšně staženo!")
-        self.progress_bar.setVisible(False)
+        downloaded_file = download_youtube_video(url, download_path)
         if downloaded_file:
             self.status_label.setText("Video bylo úspěšně staženo!")
         else:
             self.status_label.setText("Stažení se nezdařilo.")
+        self.progress_bar.setVisible(False)
 
     def download_mp4(self):
         url = self.url_input.text()
