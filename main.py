@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 
-import yt_dlp as youtube_dl
+from pytube import YouTube
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, \
     QLineEdit, QLabel, QFileDialog, QProgressBar
@@ -199,41 +199,30 @@ class MyApp(QWidget):
             logging.error(f"Invalid YouTube URL: {url}")
             return
 
-        logging.info(f"Downloading audio for URL: {url}")
+        logging.info(f"Downloading video for URL: {url}")
         download_path = get_save_path()
 
         self.progress_bar.setVisible(True)
         self.progress_bar.setValue(0)
 
-        downloaded_file = download_audio(url, download_path,
-                                         self.progress_bar.setValue)
+        downloaded_file = download_youtube_video(url, download_path)
         if downloaded_file:
-            self.status_label.setText("Audio bylo úspěšně staženo!")
-        self.progress_bar.setVisible(False)
-        if not downloaded_file:
+            self.status_label.setText("Video bylo úspěšně staženo!")
+        else:
             self.status_label.setText("Stažení se nezdařilo.")
+        self.progress_bar.setVisible(False)
 
 
-# Function to download video from YouTube
-def download_video(url, output_path, progress_callback=None):
-    ydl_opts = {
-        'format': 'bestvideo+bestaudio/best',
-        'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
-        'progress_hooks': [lambda d: progress_callback(int(
-            d['downloaded_bytes'] / d[
-                'total_bytes'] * 100)) if progress_callback and d[
-            'status'] == 'downloading' else None],
-    }
-
+def download_youtube_video(url, output_path='.'):
     try:
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
-            info_dict = ydl.extract_info(url, download=False)
-            file_name = ydl.prepare_filename(info_dict)
-            logging.info(f"Downloaded and saved to: {file_name}")
-            return file_name
+        yt = YouTube(url)
+        video_stream = yt.streams.get_highest_resolution()
+        logging.info(f"Stahuji: {yt.title}")
+        video_stream.download(output_path=output_path)
+        logging.info(f"Video úspěšně staženo jako '{yt.title}.mp4' do složky {output_path}")
+        return os.path.join(output_path, f"{yt.title}.mp4")
     except Exception as e:
-        logging.error(f"Error downloading video: {e}", exc_info=True)
+        logging.error(f"Chyba při stahování videa: {e}", exc_info=True)
         return None
 
 
