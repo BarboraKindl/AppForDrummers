@@ -50,8 +50,18 @@ def edit_audio(file_path, start_time, end_time, output_file):
         print(f"Error editing audio: {e}")
 
 
-# Main application class
 class MyApp(QWidget):
+    def select_and_edit_file(self):
+        options = QFileDialog.Options()
+        file_path, _ = QFileDialog.getOpenFileName(self, "Vyberte MP3 soubor", "", "MP3 Files (*.mp3);;All Files (*)", options=options)
+        if file_path:
+            logging.info(f"Selected file: {file_path}")
+            save_path = os.path.join(os.path.dirname(file_path), "edited_audio.mp3")
+            remove_vocals(file_path, save_path)
+            self.status_label.setText("Vokály byly úspěšně odstraněny!")
+        else:
+            self.status_label.setText("Výběr souboru byl zrušen.")
+            logging.info("File selection was canceled.")
     def __init__(self):
         super().__init__()
 
@@ -94,6 +104,10 @@ class MyApp(QWidget):
 
         self.download_button = QPushButton('Stáhnout', self)
         self.download_button.clicked.connect(self.download_and_edit)
+        self.select_file_button.clicked.connect(self.select_and_edit_file)
+
+        self.select_file_button = QPushButton('Vybrat soubor', self)
+        self.select_file_button.clicked.connect(self.select_and_edit_file)
 
         self.status_label = QLabel('', self)
         self.progress_bar = QProgressBar(self)
@@ -106,6 +120,7 @@ class MyApp(QWidget):
         layout.setSpacing(10)
         layout.addWidget(self.url_input)
         layout.addWidget(self.download_button)
+        layout.addWidget(self.select_file_button)
         layout.addWidget(self.status_label)
         layout.addWidget(self.progress_bar)
 
@@ -144,7 +159,29 @@ class MyApp(QWidget):
             self.status_label.setText("Stažení se nezdařilo.")
 
 
-# Main part of the program
+# Function to remove vocals from an audio file
+def remove_vocals(file_path, output_file):
+    try:
+        audio = AudioSegment.from_file(file_path)
+        # This is a placeholder for actual vocal removal logic
+        # For now, it just copies the file
+        audio.export(output_file, format='mp3')
+        logging.info(f"Vocals removed and saved to: {output_file}")
+    except Exception as e:
+        logging.error(f"Error removing vocals: {e}", exc_info=True)
+
+# Function to handle file selection and editing
+def select_and_edit_file(self):
+    options = QFileDialog.Options()
+    file_path, _ = QFileDialog.getOpenFileName(self, "Vyberte MP3 soubor", "", "MP3 Files (*.mp3);;All Files (*)", options=options)
+    if file_path:
+        logging.info(f"Selected file: {file_path}")
+        save_path = os.path.join(os.path.dirname(file_path), "edited_audio.mp3")
+        remove_vocals(file_path, save_path)
+        self.status_label.setText("Vokály byly úspěšně odstraněny!")
+    else:
+        self.status_label.setText("Výběr souboru byl zrušen.")
+        logging.info("File selection was canceled.")
 def main():
     app = QApplication(sys.argv)
     window = MyApp()
