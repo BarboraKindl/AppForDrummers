@@ -104,7 +104,6 @@ class MyApp(QWidget):
 
         self.download_button = QPushButton('Stáhnout', self)
         self.download_button.clicked.connect(self.download_and_edit)
-        self.select_file_button.clicked.connect(self.select_and_edit_file)
 
         self.select_file_button = QPushButton('Vybrat soubor', self)
         self.select_file_button.clicked.connect(self.select_and_edit_file)
