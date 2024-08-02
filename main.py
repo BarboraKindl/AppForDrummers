@@ -2,12 +2,11 @@ import logging
 import os
 import sys
 
-import youtube_dl
-import yt_dlp as youtube_dl
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, \
     QLineEdit, QLabel, QFileDialog, QProgressBar
 from pydub import AudioSegment
+import yt_dlp as youtube_dl  # Use yt_dlp for YouTube downloads
 
 # Logging settings
 logging.basicConfig(level=logging.INFO,
@@ -15,6 +14,12 @@ logging.basicConfig(level=logging.INFO,
 
 
 def get_save_path(file_path=None):
+    """
+    Get the download path for files, creating it if it doesn't exist.
+
+    :param file_path: Optional file path to determine specific save location
+    :return: The path where files should be saved
+    """
     download_path = os.path.expanduser("~/Downloads")
     os.makedirs(download_path, exist_ok=True)
     if file_path:
@@ -24,8 +29,15 @@ def get_save_path(file_path=None):
     return download_path
 
 
-# Function to download audio from YouTube
 def download_audio(url, output_path, progress_callback=None):
+    """
+    Download audio from a YouTube URL.
+
+    :param url: YouTube URL to download audio from
+    :param output_path: Path where the audio will be saved
+    :param progress_callback: Optional callback to update progress
+    :return: The path of the downloaded audio file or None if failed
+    """
     ydl_opts = {
         'format': 'bestaudio/best',
         'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
@@ -42,8 +54,7 @@ def download_audio(url, output_path, progress_callback=None):
 
     try:
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
-            info_dict = ydl.extract_info(url, download=False)
+            info_dict = ydl.extract_info(url, download=True)
             file_name = ydl.prepare_filename(info_dict).replace('.webm',
                                                                 '.mp3').replace(
                 '.m4a', '.mp3')
@@ -54,19 +65,33 @@ def download_audio(url, output_path, progress_callback=None):
         return None
 
 
-# Function to edit audio
 def edit_audio(file_path, start_time, end_time, output_file):
+    """
+    Edit an audio file by trimming and applying fade effects.
+
+    :param file_path: Path of the input audio file
+    :param start_time: Start time in milliseconds for trimming
+    :param end_time: End time in milliseconds for trimming
+    :param output_file: Path where the edited audio will be saved
+    """
     try:
         audio = AudioSegment.from_file(file_path)
         edited_audio = audio[start_time:end_time]
         edited_audio = edited_audio.fade_in(2000).fade_out(2000)
         edited_audio.export(output_file, format='mp3')
     except Exception as e:
-        print(f"Error editing audio: {e}")
+        logging.error(f"Error editing audio: {e}")
 
 
 class MyApp(QWidget):
+    """
+    Main application class for the DrumApp GUI.
+    """
+
     def select_and_edit_file(self):
+        """
+        Open a file dialog to select and edit an MP3 file.
+        """
         options = QFileDialog.Options()
         file_path, _ = QFileDialog.getOpenFileName(self, "Vyberte MP3 soubor",
                                                    "",
@@ -82,6 +107,9 @@ class MyApp(QWidget):
             logging.info("File selection was canceled.")
 
     def __init__(self):
+        """
+        Initialize the main application window.
+        """
         super().__init__()
 
         # Window settings
@@ -163,6 +191,9 @@ class MyApp(QWidget):
         self.setLayout(layout)
 
     def download_mp3(self):
+        """
+        Handle mp3 download when the download button is clicked.
+        """
         url = self.url_input.text()
         if not url:
             self.status_label.setText("Prosím, vložte platné YouTube URL.")
@@ -173,20 +204,24 @@ class MyApp(QWidget):
             logging.error(f"Invalid YouTube URL: {url}")
             return
 
-        logging.info(f"Downloading video for URL: {url}")
+        logging.info(f"Downloading audio for URL: {url}")
         download_path = get_save_path()
 
         self.progress_bar.setVisible(True)
         self.progress_bar.setValue(0)
 
-        downloaded_file = download_youtube_video(url, download_path)
+        downloaded_file = download_audio(url, download_path,
+                                         self.update_progress)
         if downloaded_file:
-            self.status_label.setText("Video bylo úspěšně staženo!")
+            self.status_label.setText("Audio bylo úspěšně staženo!")
         else:
             self.status_label.setText("Stažení se nezdařilo.")
         self.progress_bar.setVisible(False)
 
     def download_mp4(self):
+        """
+        Handle mp4 download when the download button is clicked.
+        """
         url = self.url_input.text()
         if not url:
             self.status_label.setText("Prosím, vložte platné YouTube URL.")
@@ -203,27 +238,47 @@ class MyApp(QWidget):
         self.progress_bar.setVisible(True)
         self.progress_bar.setValue(0)
 
-        downloaded_file = download_youtube_video(url, download_path)
+        downloaded_file = download_video(url, download_path,
+                                         self.update_progress)
         if downloaded_file:
             self.status_label.setText("Video bylo úspěšně staženo!")
         else:
             self.status_label.setText("Stažení se nezdařilo.")
         self.progress_bar.setVisible(False)
 
+    def update_progress(self, percent):
+        """
+        Update the progress bar during download.
 
-def download_youtube_video(url, output_path='.'):
+        :param percent: Download progress percentage
+        """
+        self.progress_bar.setValue(percent)
+
+
+def download_video(url, output_path='.', progress_callback=None):
+    """
+    Download video from a YouTube URL in MP4 format.
+
+    :param url: YouTube URL to download video from
+    :param output_path: Path where the video will be saved
+    :param progress_callback: Optional callback to update progress
+    :return: The path of the downloaded video file or None if failed
+    """
     ydl_opts = {
-        'format': 'bestvideo+bestaudio/best',
+        'format': 'mp4/best',  # Enforce MP4 format
         'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
-        'progress_hooks': [lambda d: logging.info(f"Stahování: {d['_percent_str']}")],
+        'progress_hooks': [lambda d: progress_callback(int(
+            d['downloaded_bytes'] / d[
+                'total_bytes'] * 100)) if progress_callback and d[
+            'status'] == 'downloading' else None],
     }
 
     try:
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
-            info_dict = ydl.extract_info(url, download=False)
+            info_dict = ydl.extract_info(url, download=True)
             file_name = ydl.prepare_filename(info_dict)
-            logging.info(f"Video úspěšně staženo jako '{file_name}' do složky {output_path}")
+            logging.info(
+                f"Video úspěšně staženo jako '{file_name}' do složky {output_path}")
             return file_name
     except Exception as e:
         logging.error(f"Chyba při stahování videa: {e}", exc_info=True)
