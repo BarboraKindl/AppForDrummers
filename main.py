@@ -155,7 +155,6 @@ class MyApp(QWidget):
         layout.addWidget(self.url_input)
         layout.addWidget(self.download_button)
         layout.addWidget(self.select_file_button)
-        layout.addWidget(self.new_button)
         layout.addWidget(self.status_label)
         layout.addWidget(self.progress_bar)
 
