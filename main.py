@@ -3,7 +3,7 @@ import os
 import sys
 
 import youtube_dl
-from pytube import YouTube
+import yt_dlp as youtube_dl
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, \
     QLineEdit, QLabel, QFileDialog, QProgressBar
@@ -212,13 +212,19 @@ class MyApp(QWidget):
 
 
 def download_youtube_video(url, output_path='.'):
+    ydl_opts = {
+        'format': 'bestvideo+bestaudio/best',
+        'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
+        'progress_hooks': [lambda d: logging.info(f"Stahování: {d['_percent_str']}")],
+    }
+
     try:
-        yt = YouTube(url)
-        video_stream = yt.streams.get_highest_resolution()
-        logging.info(f"Stahuji: {yt.title}")
-        video_stream.download(output_path=output_path)
-        logging.info(f"Video úspěšně staženo jako '{yt.title}.mp4' do složky {output_path}")
-        return os.path.join(output_path, f"{yt.title}.mp4")
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+            info_dict = ydl.extract_info(url, download=False)
+            file_name = ydl.prepare_filename(info_dict)
+            logging.info(f"Video úspěšně staženo jako '{file_name}' do složky {output_path}")
+            return file_name
     except Exception as e:
         logging.error(f"Chyba při stahování videa: {e}", exc_info=True)
         return None
