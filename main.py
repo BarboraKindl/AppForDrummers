@@ -57,8 +57,8 @@ class MyApp(QWidget):
         if file_path:
             logging.info(f"Selected file: {file_path}")
             save_path = os.path.join(os.path.dirname(file_path), "edited_audio.mp3")
-            remove_vocals(file_path, save_path)
-            self.status_label.setText("Vokály byly úspěšně odstraněny!")
+            remove_drums(file_path, save_path)
+            self.status_label.setText("Bicí byly úspěšně odstraněny!")
         else:
             self.status_label.setText("Výběr souboru byl zrušen.")
             logging.info("File selection was canceled.")
@@ -158,29 +158,17 @@ class MyApp(QWidget):
             self.status_label.setText("Stažení se nezdařilo.")
 
 
-# Function to remove vocals from an audio file
-def remove_vocals(file_path, output_file):
+# Function to remove drums from an audio file
+def remove_drums(file_path, output_file):
     try:
         audio = AudioSegment.from_file(file_path)
         # This is a placeholder for actual vocal removal logic
         # For now, it just copies the file
         audio.export(output_file, format='mp3')
-        logging.info(f"Vocals removed and saved to: {output_file}")
+        logging.info(f"Drums removed and saved to: {output_file}")
     except Exception as e:
-        logging.error(f"Error removing vocals: {e}", exc_info=True)
+        logging.error(f"Error removing drums: {e}", exc_info=True)
 
-# Function to handle file selection and editing
-def select_and_edit_file(self):
-    options = QFileDialog.Options()
-    file_path, _ = QFileDialog.getOpenFileName(self, "Vyberte MP3 soubor", "", "MP3 Files (*.mp3);;All Files (*)", options=options)
-    if file_path:
-        logging.info(f"Selected file: {file_path}")
-        save_path = os.path.join(os.path.dirname(file_path), "edited_audio.mp3")
-        remove_vocals(file_path, save_path)
-        self.status_label.setText("Vokály byly úspěšně odstraněny!")
-    else:
-        self.status_label.setText("Výběr souboru byl zrušen.")
-        logging.info("File selection was canceled.")
 def main():
     app = QApplication(sys.argv)
     window = MyApp()
