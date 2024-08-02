@@ -29,12 +29,12 @@ Make sure you have all the necessary dependencies installed before running the s
 
 ## Installation
 
-### Installing youtube_dl
+### Installing yt_dlp
 
-To install `youtube_dl`, you can use pip:
+To install `yt_dlp`, you can use pip:
 
 ```bash
-pip install youtube_dl
+pip install yt-dlp
 ```
 
 1. Clone the repository:
