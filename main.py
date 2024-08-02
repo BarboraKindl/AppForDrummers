@@ -136,7 +136,7 @@ class MyApp(QWidget):
         self.url_input = QLineEdit(self)
         self.url_input.setPlaceholderText("Vložte YouTube URL")
 
-        self.download_button = QPushButton('Stáhnout', self)
+        self.download_button = QPushButton('Stáhnout mp3', self)
         self.download_button.clicked.connect(self.download_and_edit)
 
         self.select_file_button = QPushButton('Vybrat soubor', self)
