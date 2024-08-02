@@ -1,0 +1,3 @@
+([('main',
+   '/Users/barbora/PycharmProjects/MusicMakerForDrummers/dist/main',
+   'EXECUTABLE')],)
