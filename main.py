@@ -133,29 +133,22 @@ class MyApp(QWidget):
             self.status_label.setText("Prosím, vložte platné YouTube URL.")
             return
 
-        if not ("youtube.com/watch?v=" in url or "youtu.be/" in url):
+        if not validate_youtube_url(url):
             self.status_label.setText("Neplatné YouTube URL.")
-            logging.error(f"Invalid YouTube URL: {url}")
             return
 
         logging.info(f"Downloading and editing audio for URL: {url}")
-        download_path = os.path.expanduser("~/Downloads")
-        os.makedirs(download_path, exist_ok=True)
+        download_path = get_save_path()
 
         self.progress_bar.setVisible(True)
         self.progress_bar.setValue(0)
 
         downloaded_file = download_audio(url, download_path, self.progress_bar.setValue)
         if downloaded_file:
-            base_name = os.path.basename(downloaded_file)
-            name, ext = os.path.splitext(base_name)
-            save_path = os.path.join(download_path, f"{name}_drumless{ext}")
+            save_path = get_save_path(downloaded_file)
             remove_drums(downloaded_file, save_path)
-        if downloaded_file:
-            remove_drums(downloaded_file, save_path)
-        else:
-            self.progress_bar.setVisible(False)
-            logging.error("Download failed.")
+        self.progress_bar.setVisible(False)
+        if not downloaded_file:
             self.status_label.setText("Stažení se nezdařilo.")
 
 
@@ -170,7 +163,20 @@ def remove_drums(file_path, output_file):
     except Exception as e:
         logging.error(f"Error removing drums: {e}", exc_info=True)
 
-def main():
+def validate_youtube_url(url):
+    if "youtube.com/watch?v=" in url or "youtu.be/" in url:
+        return True
+    logging.error(f"Invalid YouTube URL: {url}")
+    return False
+
+def get_save_path(file_path=None):
+    download_path = os.path.expanduser("~/Downloads")
+    os.makedirs(download_path, exist_ok=True)
+    if file_path:
+        base_name = os.path.basename(file_path)
+        name, ext = os.path.splitext(base_name)
+        return os.path.join(download_path, f"{name}_drumless{ext}")
+    return download_path
     app = QApplication(sys.argv)
     window = MyApp()
     window.show()
