@@ -75,10 +75,7 @@ class MyApp(QWidget):
             logging.info(f"Selected file: {file_path}")
             base_name = os.path.basename(file_path)
             name, ext = os.path.splitext(base_name)
-            save_path = os.path.join(os.path.dirname(file_path),
-                                     f"{name}_drumless{ext}")
-            remove_drums(file_path, save_path)
-            self.status_label.setText("Bicí byly úspěšně odstraněny!")
+            self.status_label.setText("Soubor byl úspěšně vybrán!")
         else:
             self.status_label.setText("Výběr souboru byl zrušen.")
             logging.info("File selection was canceled.")
@@ -211,8 +208,7 @@ class MyApp(QWidget):
         downloaded_file = download_audio(url, download_path,
                                          self.progress_bar.setValue)
         if downloaded_file:
-            save_path = get_save_path(downloaded_file)
-            remove_drums(downloaded_file, save_path)
+            self.status_label.setText("Audio bylo úspěšně staženo!")
         self.progress_bar.setVisible(False)
         if not downloaded_file:
             self.status_label.setText("Stažení se nezdařilo.")
@@ -239,15 +235,6 @@ def download_video(url, output_path, progress_callback=None):
     except Exception as e:
         logging.error(f"Error downloading video: {e}", exc_info=True)
         return None
-def remove_drums(file_path, output_file):
-    try:
-        audio = AudioSegment.from_file(file_path)
-        # This is a placeholder for actual vocal removal logic
-        # For now, it just copies the file
-        audio.export(output_file, format='mp3')
-        logging.info(f"Drums removed and saved to: {output_file}")
-    except Exception as e:
-        logging.error(f"Error removing drums: {e}", exc_info=True)
 
 
 if __name__ == "__main__":
