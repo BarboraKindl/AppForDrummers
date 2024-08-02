@@ -143,6 +143,7 @@ class MyApp(QWidget):
         self.progress_bar.setVisible(True)
         self.progress_bar.setValue(0)
 
+        save_path = os.path.join(download_path, "edited_audio.mp3")
         downloaded_file = download_audio(url, download_path, self.progress_bar.setValue)
         if downloaded_file:
             remove_drums(downloaded_file, save_path)
