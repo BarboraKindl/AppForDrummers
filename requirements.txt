@@ -3,4 +3,4 @@ flask==2.0.1
 Pillow==8.2.0
 numpy==1.21.0
 pytube==15.0.0
-youtube_dl==2021.12.17
+yt-dlp
