@@ -4,6 +4,7 @@ import sys
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, \
+    QHBoxLayout, \
     QLineEdit, QLabel, QFileDialog, QProgressBar
 from pydub import AudioSegment
 import yt_dlp as youtube_dl  # Use yt_dlp for YouTube downloads
@@ -62,6 +63,36 @@ def download_audio(url, output_path, progress_callback=None):
             return file_name
     except Exception as e:
         logging.error(f"Error downloading audio: {e}", exc_info=True)
+        return None
+
+
+def download_video(url, output_path='.', progress_callback=None):
+    """
+    Download video from a YouTube URL in MP4 format.
+
+    :param url: YouTube URL to download video from
+    :param output_path: Path where the video will be saved
+    :param progress_callback: Optional callback to update progress
+    :return: The path of the downloaded video file or None if failed
+    """
+    ydl_opts = {
+        'format': 'mp4/best',  # Enforce MP4 format
+        'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
+        'progress_hooks': [lambda d: progress_callback(int(
+            d['downloaded_bytes'] / d[
+                'total_bytes'] * 100)) if progress_callback and d[
+            'status'] == 'downloading' else None],
+    }
+
+    try:
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(url, download=True)
+            file_name = ydl.prepare_filename(info_dict)
+            logging.info(
+                f"Video úspěšně staženo jako '{file_name}' do složky {output_path}")
+            return file_name
+    except Exception as e:
+        logging.error(f"Chyba při stahování videa: {e}", exc_info=True)
         return None
 
 
@@ -182,8 +213,15 @@ class MyApp(QWidget):
         layout.setContentsMargins(30, 30, 30, 30)
         layout.setSpacing(15)
         layout.addWidget(self.url_input)
-        layout.addWidget(self.download_button)
-        layout.addWidget(self.download_mp4_button)
+
+        # Create a horizontal layout for the mp3 and mp4 buttons
+        button_layout = QHBoxLayout()
+        button_layout.addWidget(self.download_button)
+        button_layout.addWidget(self.download_mp4_button)
+
+        # Add the button layout to the main layout
+        layout.addLayout(button_layout)
+
         layout.addWidget(self.select_file_button)
         layout.addWidget(self.status_label)
         layout.addWidget(self.progress_bar)
@@ -253,36 +291,6 @@ class MyApp(QWidget):
         :param percent: Download progress percentage
         """
         self.progress_bar.setValue(percent)
-
-
-def download_video(url, output_path='.', progress_callback=None):
-    """
-    Download video from a YouTube URL in MP4 format.
-
-    :param url: YouTube URL to download video from
-    :param output_path: Path where the video will be saved
-    :param progress_callback: Optional callback to update progress
-    :return: The path of the downloaded video file or None if failed
-    """
-    ydl_opts = {
-        'format': 'mp4/best',  # Enforce MP4 format
-        'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
-        'progress_hooks': [lambda d: progress_callback(int(
-            d['downloaded_bytes'] / d[
-                'total_bytes'] * 100)) if progress_callback and d[
-            'status'] == 'downloading' else None],
-    }
-
-    try:
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(url, download=True)
-            file_name = ydl.prepare_filename(info_dict)
-            logging.info(
-                f"Video úspěšně staženo jako '{file_name}' do složky {output_path}")
-            return file_name
-    except Exception as e:
-        logging.error(f"Chyba při stahování videa: {e}", exc_info=True)
-        return None
 
 
 if __name__ == "__main__":
