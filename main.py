@@ -149,6 +149,8 @@ class MyApp(QWidget):
         self.status_label = QLabel('', self)
         self.progress_bar = QProgressBar(self)
         self.progress_bar.setValue(0)
+        else:
+            self.status_label.setText("Stažení se nezdařilo.")
         self.progress_bar.setVisible(False)
 
         # Layout settings
@@ -184,8 +186,7 @@ class MyApp(QWidget):
         downloaded_file = download_video(url, download_path,
                                          self.progress_bar.setValue)
         if downloaded_file:
-            save_path = get_save_path(downloaded_file)
-            remove_drums(downloaded_file, save_path)
+            self.status_label.setText("Audio bylo úspěšně staženo!")
         self.progress_bar.setVisible(False)
         if downloaded_file:
             self.status_label.setText("Video bylo úspěšně staženo!")
@@ -203,7 +204,7 @@ class MyApp(QWidget):
             logging.error(f"Invalid YouTube URL: {url}")
             return
 
-        logging.info(f"Downloading and editing audio for URL: {url}")
+        logging.info(f"Downloading audio for URL: {url}")
         download_path = get_save_path()
 
         self.progress_bar.setVisible(True)
