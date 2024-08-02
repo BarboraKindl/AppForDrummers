@@ -56,7 +56,9 @@ class MyApp(QWidget):
         file_path, _ = QFileDialog.getOpenFileName(self, "Vyberte MP3 soubor", "", "MP3 Files (*.mp3);;All Files (*)", options=options)
         if file_path:
             logging.info(f"Selected file: {file_path}")
-            save_path = os.path.join(os.path.dirname(file_path), "edited_audio.mp3")
+            base_name = os.path.basename(file_path)
+            name, ext = os.path.splitext(base_name)
+            save_path = os.path.join(os.path.dirname(file_path), f"{name}_drumless{ext}")
             remove_drums(file_path, save_path)
             self.status_label.setText("Bicí byly úspěšně odstraněny!")
         else:
@@ -143,7 +145,9 @@ class MyApp(QWidget):
         self.progress_bar.setVisible(True)
         self.progress_bar.setValue(0)
 
-        save_path = os.path.join(download_path, "edited_audio.mp3")
+        base_name = os.path.basename(downloaded_file)
+        name, ext = os.path.splitext(base_name)
+        save_path = os.path.join(download_path, f"{name}_drumless{ext}")
         downloaded_file = download_audio(url, download_path, self.progress_bar.setValue)
         if downloaded_file:
             remove_drums(downloaded_file, save_path)
