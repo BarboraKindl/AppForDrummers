@@ -163,6 +163,8 @@ def remove_drums(file_path, output_file):
     except Exception as e:
         logging.error(f"Error removing drums: {e}", exc_info=True)
 
+def validate_youtube_url(url):
+
 def main():
     app = QApplication(sys.argv)
     window = MyApp()
