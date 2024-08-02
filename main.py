@@ -133,6 +133,7 @@ class MyApp(QWidget):
                 background-color: #e74c3c;
             }
         """)
+
         self.url_input = QLineEdit(self)
         self.url_input.setPlaceholderText("Vložte YouTube URL")
 
