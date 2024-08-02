@@ -149,8 +149,6 @@ class MyApp(QWidget):
         self.status_label = QLabel('', self)
         self.progress_bar = QProgressBar(self)
         self.progress_bar.setValue(0)
-        else:
-            self.status_label.setText("Stažení se nezdařilo.")
         self.progress_bar.setVisible(False)
 
         # Layout settings
