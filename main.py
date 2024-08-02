@@ -2,6 +2,7 @@ import logging
 import os
 import sys
 
+import youtube_dl
 from pytube import YouTube
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, \
