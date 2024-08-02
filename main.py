@@ -137,7 +137,7 @@ class MyApp(QWidget):
         self.url_input.setPlaceholderText("Vložte YouTube URL")
 
         self.download_button = QPushButton('Stáhnout mp3', self)
-        self.download_button.clicked.connect(self.download_and_edit)
+        self.download_button.clicked.connect(self.download_mp3)
 
         self.select_file_button = QPushButton('Vybrat soubor', self)
         self.select_file_button.clicked.connect(self.select_and_edit_file)
@@ -159,7 +159,7 @@ class MyApp(QWidget):
 
         self.setLayout(layout)
 
-    def download_and_edit(self):
+    def download_mp3(self):
         url = self.url_input.text()
         if not url:
             self.status_label.setText("Prosím, vložte platné YouTube URL.")
