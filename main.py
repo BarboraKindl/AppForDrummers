@@ -4,8 +4,7 @@ import sys
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, \
-    QHBoxLayout, \
-    QLineEdit, QLabel, QFileDialog, QProgressBar
+    QLineEdit, QLabel, QFileDialog, QProgressBar, QHBoxLayout  # Import QHBoxLayout
 from pydub import AudioSegment
 import yt_dlp as youtube_dl  # Use yt_dlp for YouTube downloads
 
@@ -66,36 +65,6 @@ def download_audio(url, output_path, progress_callback=None):
         return None
 
 
-def download_video(url, output_path='.', progress_callback=None):
-    """
-    Download video from a YouTube URL in MP4 format.
-
-    :param url: YouTube URL to download video from
-    :param output_path: Path where the video will be saved
-    :param progress_callback: Optional callback to update progress
-    :return: The path of the downloaded video file or None if failed
-    """
-    ydl_opts = {
-        'format': 'mp4/best',  # Enforce MP4 format
-        'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
-        'progress_hooks': [lambda d: progress_callback(int(
-            d['downloaded_bytes'] / d[
-                'total_bytes'] * 100)) if progress_callback and d[
-            'status'] == 'downloading' else None],
-    }
-
-    try:
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(url, download=True)
-            file_name = ydl.prepare_filename(info_dict)
-            logging.info(
-                f"Video úspěšně staženo jako '{file_name}' do složky {output_path}")
-            return file_name
-    except Exception as e:
-        logging.error(f"Chyba při stahování videa: {e}", exc_info=True)
-        return None
-
-
 def edit_audio(file_path, start_time, end_time, output_file):
     """
     Edit an audio file by trimming and applying fade effects.
@@ -118,24 +87,6 @@ class MyApp(QWidget):
     """
     Main application class for the DrumApp GUI.
     """
-
-    def select_and_edit_file(self):
-        """
-        Open a file dialog to select and edit an MP3 file.
-        """
-        options = QFileDialog.Options()
-        file_path, _ = QFileDialog.getOpenFileName(self, "Vyberte MP3 soubor",
-                                                   "",
-                                                   "MP3 Files (*.mp3);;All Files (*)",
-                                                   options=options)
-        if file_path:
-            logging.info(f"Selected file: {file_path}")
-            base_name = os.path.basename(file_path)
-            name, ext = os.path.splitext(base_name)
-            self.status_label.setText("Soubor byl úspěšně vybrán!")
-        else:
-            self.status_label.setText("Výběr souboru byl zrušen.")
-            logging.info("File selection was canceled.")
 
     def __init__(self):
         """
@@ -208,25 +159,40 @@ class MyApp(QWidget):
         self.progress_bar.setValue(0)
         self.progress_bar.setVisible(False)
 
+        # Create a horizontal layout for the download buttons
+        download_layout = QHBoxLayout()
+        download_layout.addWidget(self.download_button)
+        download_layout.addWidget(self.download_mp4_button)
+
         # Layout settings
         layout = QVBoxLayout()
         layout.setContentsMargins(30, 30, 30, 30)
         layout.setSpacing(15)
         layout.addWidget(self.url_input)
-
-        # Create a horizontal layout for the mp3 and mp4 buttons
-        button_layout = QHBoxLayout()
-        button_layout.addWidget(self.download_button)
-        button_layout.addWidget(self.download_mp4_button)
-
-        # Add the button layout to the main layout
-        layout.addLayout(button_layout)
-
+        layout.addLayout(download_layout)  # Add the horizontal layout here
         layout.addWidget(self.select_file_button)
         layout.addWidget(self.status_label)
         layout.addWidget(self.progress_bar)
 
         self.setLayout(layout)
+
+    def select_and_edit_file(self):
+        """
+        Open a file dialog to select and edit an MP3 file.
+        """
+        options = QFileDialog.Options()
+        file_path, _ = QFileDialog.getOpenFileName(self, "Vyberte MP3 soubor",
+                                                   "",
+                                                   "MP3 Files (*.mp3);;All Files (*)",
+                                                   options=options)
+        if file_path:
+            logging.info(f"Selected file: {file_path}")
+            base_name = os.path.basename(file_path)
+            name, ext = os.path.splitext(base_name)
+            self.status_label.setText("Soubor byl úspěšně vybrán!")
+        else:
+            self.status_label.setText("Výběr souboru byl zrušen.")
+            logging.info("File selection was canceled.")
 
     def download_mp3(self):
         """
@@ -291,6 +257,36 @@ class MyApp(QWidget):
         :param percent: Download progress percentage
         """
         self.progress_bar.setValue(percent)
+
+
+def download_video(url, output_path='.', progress_callback=None):
+    """
+    Download video from a YouTube URL in MP4 format.
+
+    :param url: YouTube URL to download video from
+    :param output_path: Path where the video will be saved
+    :param progress_callback: Optional callback to update progress
+    :return: The path of the downloaded video file or None if failed
+    """
+    ydl_opts = {
+        'format': 'mp4/best',  # Enforce MP4 format
+        'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
+        'progress_hooks': [lambda d: progress_callback(int(
+            d['downloaded_bytes'] / d[
+                'total_bytes'] * 100)) if progress_callback and d[
+            'status'] == 'downloading' else None],
+    }
+
+    try:
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(url, download=True)
+            file_name = ydl.prepare_filename(info_dict)
+            logging.info(
+                f"Video úspěšně staženo jako '{file_name}' do složky {output_path}")
+            return file_name
+    except Exception as e:
+        logging.error(f"Chyba při stahování videa: {e}", exc_info=True)
+        return None
 
 
 if __name__ == "__main__":
